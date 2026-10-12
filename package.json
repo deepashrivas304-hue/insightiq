@@ -1,0 +1,7 @@
+{"name":"insightiq","private":true,"scripts":{
+"setup":"npm install && npm install --prefix server && npm install --prefix client",
+"db:push":"npm run db:push --prefix server","seed":"npm run seed --prefix server",
+"dev":"concurrently -n api,web \"npm:dev --prefix server\" \"npm:dev --prefix client\"",
+"build":"npm run build --prefix server && npm run build --prefix client",
+"test":"npm test --prefix server && npm test --prefix client","typecheck":"npm run typecheck --prefix server && npm run typecheck --prefix client"},
+"devDependencies":{"concurrently":"^8.2.2"}}

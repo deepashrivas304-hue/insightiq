@@ -1,0 +1,10 @@
+export type Role = 'ADMIN' | 'ANALYST' | 'VIEWER';
+export type User = { id: string; name: string; email: string; role: Role };
+export type Point = { label: string; value: number };
+export type Filter = { field: string; op: 'eq' | 'in' | 'gte' | 'lte'; value: string | number | (string | number)[] };
+export type Mapping = Record<string, string>;
+export type Column = { id?: string; name: string; type: 'number' | 'date' | 'string'; position?: number };
+export type Dataset = { id: string; name: string; filename: string; source: string; isDemo: boolean; status: string; rowCount: number; mapping: Mapping; createdAt: string; updatedAt: string; owner?: { name: string }; _count?: { columns: number } };
+export type ChartType = 'line' | 'bar' | 'hbar' | 'area' | 'pie' | 'doughnut' | 'table' | 'kpi';
+export type QueryState = { datasetId: string; dimension?: string; bucket?: string; measure?: string; agg: string; filters: Filter[]; from?: string; to?: string; dateField?: string; limit: number; sort: string };
+export type Widget = QueryState & { id: string; title: string; type: ChartType; width: number };

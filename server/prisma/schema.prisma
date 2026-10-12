@@ -1,0 +1,98 @@
+   generator client {
+     provider = "prisma-client-js"
+   }
+
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+
+   enum Role {
+     ADMIN
+     ANALYST
+     VIEWER
+   }
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  passwordHash String
+  role Role @default(ANALYST)
+  createdAt DateTime @default(now())
+  datasets Dataset[]
+  dashboards Dashboard[]
+  kpis Kpi[]
+  audit AuditLog[]
+}
+model Dataset {
+  id String @id @default(cuid())
+  name String
+  filename String
+  source String @default("file")
+  isDemo Boolean @default(false)
+  status String @default("READY")
+  rowCount Int @default(0)
+  mapping Json @default("{}")
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  columns DatasetColumn[]
+  rows DatasetRow[]
+  kpis Kpi[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([ownerId])
+}
+model DatasetColumn {
+  id String @id @default(cuid())
+  datasetId String
+  dataset Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  name String
+  type String
+  position Int
+  @@unique([datasetId, name])
+}
+// Imported rows are stored as JSONB (see README "Data storage strategy").
+model DatasetRow {
+  id Int @id @default(autoincrement())
+  datasetId String
+  dataset Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  data Json
+  @@index([datasetId])
+}
+model Dashboard {
+  id String @id @default(cuid())
+  name String
+  description String?
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  widgets Json @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([ownerId])
+}
+model Kpi {
+  id String @id @default(cuid())
+  name String
+  datasetId String
+  dataset Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  measure String
+  aggregation String
+  target Float
+  warningPct Float @default(80)
+  period String @default("month")
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([ownerId])
+}
+model AuditLog {
+  id String @id @default(cuid())
+  userId String?
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action String
+  entity String?
+  entityId String?
+  detail String?
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
